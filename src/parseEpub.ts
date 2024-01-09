@@ -50,12 +50,22 @@ const parseMetadata = (metadata: GeneralObject[]) => {
 
   const rawIdentifiers = _.get(metadata[0], ['dc:identifier'], []) as any[]
 
-  const identifiers = rawIdentifiers.map((identifier) => {
-    return {
-      type: identifier.$.scheme || identifier.$.id || null,
-      value: identifier._,
+  const identifiers = rawIdentifiers.reduce((result, identifier) => {
+    const identifierType = identifier.$['opf:scheme'] || identifier.$.id || null
+    const value = identifier._ || null
+
+    if (!value) {
+      return result
     }
-  })
+
+    return [
+      ...result,
+      {
+        type: identifierType,
+        value: identifier._,
+      },
+    ]
+  }, [])
 
   /*
    [
