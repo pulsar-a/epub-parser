@@ -1,7 +1,7 @@
 import fs from 'fs'
 import _ from 'lodash'
 // @ts-ignore
-import nodeZip from 'node-zip'
+import NodeZip from 'node-zip'
 import xml2js from 'xml2js'
 import parseLink from './parseLink'
 import parseSection, { Section } from './parseSection'
@@ -48,7 +48,29 @@ const parseMetadata = (metadata: GeneralObject[]) => {
 
   const publisher = _.get(metadata[0], ['dc:publisher', 0]) as string
 
-  const identifiers = _.get(metadata[0], ['dc:identifier'], []) as { type: string; value: string }[]
+  const rawIdentifiers = _.get(metadata[0], ['dc:identifier'], []) as any[]
+
+  const identifiers = rawIdentifiers.map((identifier) => {
+    return {
+      type: identifier.$.scheme || identifier.$.id || null,
+      value: identifier._,
+    }
+  })
+
+  /*
+   [
+  { _: '9787508643403', '$': { 'opf:scheme': 'ISBN' } },
+  { _: 'B00HTX1RQ2', '$': { 'opf:scheme': 'MOBI-ASIN' } },
+  {
+    _: 'e5a82785-325f-4602-95bc-b20dad17e45d',
+    '$': { id: 'uuid_id', 'opf:scheme': 'uuid' }
+  },
+  {
+    _: 'e5a82785-325f-4602-95bc-b20dad17e45d',
+    '$': { 'opf:scheme': 'calibre' }
+  }
+]
+   */
 
   return {
     title,
@@ -72,12 +94,12 @@ export class Epub {
     title: string
     authors: string[]
     publisher: string
-    identifiers: { type: string; value: string }[]
+    identifiers: { type: string | null; value: string | null }[]
   }
   sections?: Section[]
 
   constructor(buffer: Buffer) {
-    this._zip = new nodeZip(buffer, { binary: true, base64: false, checkCRC32: true })
+    this._zip = new NodeZip(buffer, { binary: true, base64: false, checkCRC32: true })
   }
 
   resolve(path: string): {
