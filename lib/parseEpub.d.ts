@@ -15,6 +15,10 @@ export declare class Epub {
         title: string;
         authors: string[];
         publisher: string;
+        identifiers: {
+            type: string;
+            value: string;
+        }[];
     };
     sections?: Section[];
     constructor(buffer: Buffer);

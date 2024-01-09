@@ -47,10 +47,14 @@ const parseMetadata = (metadata: GeneralObject[]) => {
   }
 
   const publisher = _.get(metadata[0], ['dc:publisher', 0]) as string
+
+  const identifiers = _.get(metadata[0], ['dc:identifier'], []) as { type: string; value: string }[]
+
   return {
     title,
     authors,
     publisher,
+    identifiers,
   }
 }
 
@@ -68,6 +72,7 @@ export class Epub {
     title: string
     authors: string[]
     publisher: string
+    identifiers: { type: string; value: string }[]
   }
   sections?: Section[]
 
