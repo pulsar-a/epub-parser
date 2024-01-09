@@ -43,7 +43,7 @@ const parseMetadata = (metadata: GeneralObject[]) => {
   let authors: string[] = _.get(metadata[0], ['dc:creator'])
 
   if (typeof authors === 'object') {
-    authors = [_.get(authors, ['_'])]
+    authors = authors.map((author) => _.get(author, ['_']))
   }
 
   const publisher = _.get(metadata[0], ['dc:publisher', 0]) as string
